@@ -26,6 +26,9 @@ builder.Services.AddSingleton<IConfiguration>(configuration);
 // Logging
 builder.Services.AddLogging();
 
+// CORS (if needed)
+builder.Services.AddCors();
+
 // Database Context
 builder.Services.AddDbContext<ExchangeContext>(options =>
     options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
@@ -61,6 +64,12 @@ builder.Services.AddScoped(provider =>
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
 var app = builder.Build();
+
+// Enable CORS
+app.UseCors(policy =>
+    policy.AllowAnyOrigin()
+          .AllowAnyMethod()
+          .AllowAnyHeader());
 
 // Initialize Database and Load Order Books
 using (var scope = app.Services.CreateScope())
